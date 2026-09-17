@@ -1,3 +1,17 @@
+<%
+  var tocContent = toc(page.content, {
+    max_depth: theme.toc.max_depth,
+    min_depth: 1,
+    list_number: false
+  });
+  var hasToc = !!tocContent && tocContent.trim().length > 0;
+
+  var showComments = page.comments;
+  if (showComments === undefined) {
+    showComments = theme.comments.enable;
+  }
+%>
+
 <!-- 文章内容 -->
 <div class="body-container">
   <article class="content-container layout-block post-container">
@@ -14,7 +28,7 @@
         <% }) %>
       </section>
       <% } %>
-      
+
       <%# 输出Markdown内容 %>
       <section class="article-entry markdown-body layout-margin content-padding--large soft-size--large soft-style--box">
         <%- page.content %>
@@ -31,21 +45,49 @@
           <% } %>
         </nav>
       <% } %>
-
-      <section class="page-message-container layout-padding">
-        <%- partial('../_widget/comment', { post: page }) %>
-      </section>
     </div>
+
     <div class="widget-info">
       <%- partial("../_widget/widget-author") %>
-
-      <%- partial("../_widget/widget-toc", { page: page }) %>
-
       <%- partial("../_widget/widget-notice") %>
-
       <%- partial("../_widget/widget-categories") %>
-
       <%- partial("../_widget/widget-tags") %>
     </div>
   </article>
 </div>
+
+<%# 左侧固定目录栏（利用屏幕留白） %>
+<% if (hasToc) { %>
+<aside class="toc-sidebar" id="toc-sidebar">
+  <div class="toc-sidebar__panel">
+    <div class="toc-sidebar__title">
+      <%- partial("../_svg/icon-toc.svg") %>
+      <span>TOC</span>
+    </div>
+    <div class="toc-sidebar__body">
+      <%- tocContent %>
+    </div>
+  </div>
+  <button class="toc-sidebar__toggle" id="toc-toggle" type="button" aria-label="toggle toc">
+    <span class="toc-toggle__arrow">❯</span>
+  </button>
+</aside>
+<% } %>
+
+<%# 底部评论按钮 + 抽屉 %>
+<% if (showComments) { %>
+<button class="comment-fab soft-size--primary soft-style--box" id="comment-fab" type="button">
+  <%- partial("../_svg/icon-comment.svg") %>
+  <span>评论</span>
+</button>
+<div class="comment-drawer__mask" id="comment-mask"></div>
+<div class="comment-drawer" id="comment-drawer">
+  <div class="comment-drawer__header">
+    <span>评论</span>
+    <button class="comment-drawer__close" id="comment-close" type="button" aria-label="close comments">✕</button>
+  </div>
+  <div class="comment-drawer__body">
+    <%- partial('../_widget/comment', { post: page }) %>
+  </div>
+</div>
+<% } %>
